@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>差旅补贴计算器</title>
+   <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           -webkit-tap-highlight-color: transparent;
+           font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+       }
+ 
+       body {
+           background: linear-gradient(135deg, #f0f7ff 0%, #fff5ed 100%);
+           min-height: 100vh;
+           padding: 12px;
+           font-size: 16px;
+       }
+ 
+       .card {
+           background: #ffffff;
+           border-radius: 14px;
+           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+           padding: 20px 16px;
+           margin-bottom: 14px;
+       }
+ 
+       .title {
+           font-size: 20px;
+           font-weight: 600;
+           color: #1e40af;
+           text-align: center;
+           margin-bottom: 4px;
+       }
+ 
+       .subtitle {
+           font-size: 13px;
+           color: #64748b;
+           text-align: center;
+           margin-bottom: 18px;
+       }
+ 
+       .section-title {
+           font-size: 15px;
+           font-weight: 600;
+           color: #1e40af;
+           margin-bottom: 14px;
+           padding-bottom: 6px;
+           border-bottom: 2px solid #f97316;
+           display: inline-block;
+       }
+ 
+       .form-group {
+           margin-bottom: 16px;
+       }
+ 
+       label {
+           display: block;
+           font-size: 14px;
+           font-weight: 500;
+           color: #334155;
+           margin-bottom: 6px;
+       }
+ 
+       input[type="date"],
+       select {
+           width: 100%;
+           height: 44px;
+           padding: 0 12px;
+           border: 1.5px solid #e2e8f0;
+           border-radius: 8px;
+           font-size: 15px;
+           color: #1e293b;
+           background: #f8fafc;
+           outline: none;
+           -webkit-appearance: none;
+           appearance: none;
+       }
+ 
+       input[type="date"]:focus,
+       select:focus {
+           border-color: #3b82f6;
+           background: #ffffff;
+       }
+ 
+       select {
+           background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+           background-repeat: no-repeat;
+           background-position: right 12px center;
+           padding-right: 32px;
+       }
+ 
+       .radio-group {
+           display: flex;
+           gap: 24px;
+           padding: 4px 0;
+       }
+ 
+       .radio-item {
+           display: flex;
+           align-items: center;
+           gap: 6px;
+           cursor: pointer;
+           flex: 1;
+       }
+ 
+       .radio-item input[type="radio"] {
+           width: 18px;
+           height: 18px;
+           accent-color: #f97316;
+           cursor: pointer;
+       }
+ 
+       .radio-item span {
+           font-size: 15px;
+           color: #334155;
+       }
+ 
+       .warning-banner {
+           background: #fef3c7;
+           border-left: 4px solid #f59e0b;
+           padding: 10px 12px;
+           border-radius: 6px;
+           font-size: 13px;
+           color: #92400e;
+           margin-bottom: 16px;
+           line-height: 1.5;
+       }
+ 
+       .error-banner {
+           background: #fee2e2;
+           border-left: 4px solid #ef4444;
+           padding: 10px 12px;
+           border-radius: 6px;
+           font-size: 13px;
+           color: #991b1b;
+           margin-bottom: 16px;
+           display: none;
+           line-height: 1.5;
+       }
+ 
+       .result-card {
+           background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+           color: white;
+           border-radius: 12px;
+           padding: 18px 16px;
+       }
+ 
+       .result-title {
+           font-size: 15px;
+           font-weight: 500;
+           opacity: 0.9;
+           margin-bottom: 14px;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           flex-wrap: wrap;
+       }
+ 
+       .result-title .tag {
+           background: rgba(255, 255, 255, 0.2);
+           padding: 2px 8px;
+           border-radius: 4px;
+           font-size: 12px;
+           font-weight: normal;
+       }
+ 
+       .block-title {
+           font-size: 14px;
+           font-weight: 500;
+           opacity: 0.9;
+           margin-bottom: 8px;
+       }
+ 
+       .divider {
+           height: 1px;
+           background: rgba(255, 255, 255, 0.15);
+           margin: 12px 0;
+       }
+ 
+       .result-row {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 7px 0;
+           font-size: 14px;
+       }
+ 
+       .result-label {
+           opacity: 0.85;
+       }
+ 
+       .result-value {
+           font-weight: 500;
+       }
+ 
+       .total-row {
+           margin-top: 10px;
+           padding-top: 12px;
+           border-top: 2px solid rgba(255, 255, 255, 0.25);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+ 
+       .total-label {
+           font-size: 15px;
+           font-weight: 500;
+       }
+ 
+       .total-amount {
+           font-size: 22px;
+           font-weight: 700;
+           color: #fbbf24;
+       }
+ 
+       .empty-state {
+           text-align: center;
+           padding: 28px 0;
+           color: #94a3b8;
+           font-size: 14px;
+       }
+ 
+       .holiday-tip {
+           margin-top: 14px;
+           background: #fff7ed;
+           border-left: 4px solid #f97316;
+           padding: 10px 12px;
+           border-radius: 6px;
+           font-size: 13px;
+           color: #c2410c;
+           line-height: 1.5;
+       }
+ 
+       .rule-card {
+           margin-top: 14px;
+           background: #f8fafc;
+           border-radius: 10px;
+           padding: 14px 16px;
+           border: 1px solid #e2e8f0;
+       }
+ 
+       .rule-title {
+           font-size: 14px;
+           font-weight: 600;
+           color: #1e40af;
+           margin-bottom: 8px;
+       }
+ 
+       .rule-list {
+           font-size: 13px;
+           color: #334155;
+           line-height: 1.8;
+       }
+ 
+       .rule-list li {
+           list-style: none;
+           position: relative;
+           padding-left: 14px;
+       }
+ 
+       .rule-list li::before {
+           content: "•";
+           position: absolute;
+           left: 0;
+           color: #f97316;
+           font-weight: bold;
+       }
+ 
+       .footer-tip {
+           text-align: center;
+           font-size: 12px;
+           color: #94a3b8;
+           margin-top: 10px;
+           padding-top: 10px;
+           border-top: 1px solid #e2e8f0;
+       }
+   </style>
+</head>
+<body>
+   <div class="card">
+       <h1 class="title">差旅补贴计算器</h1>
+       <p class="subtitle">自动计算伙食补贴与交通补贴</p>
+ 
+       <div class="warning-banner">
+           提示：出差期间申请休假的，须扣减差旅补贴。
+       </div>
+ 
+       <div class="error-banner" id="errorBanner">
+           返回日期不能早于出发日期，请检查后重新选择。
+       </div>
+ 
+       <div class="section-title">差旅信息</div>
+ 
+       <div class="form-group">
+           <label for="startDate">出发日期</label>
+           <input type="date" id="startDate">
+       </div>
+       <div class="form-group">
+           <label for="endDate">返回日期</label>
+           <input type="date" id="endDate">
+       </div>
+ 
+       <div class="form-group">
+           <label>差旅类型</label>
+           <select id="travelType">
+               <option value="daily">日常差旅</option>
+               <option value="training-inner">培训差旅（系统内）</option>
+               <option value="training-outer">培训差旅（系统外）</option>
+           </select>
+       </div>
+ 
+       <div class="form-group">
+           <label>酒店是否含早</label>
+           <div class="radio-group">
+               <label class="radio-item">
+                   <input type="radio" name="breakfast" value="no" checked>
+                   <span>不含早</span>
+               </label>
+               <label class="radio-item">
+                   <input type="radio" name="breakfast" value="yes">
+                   <span>含早</span>
+               </label>
+           </div>
+       </div>
+   </div>
+ 
+   <div class="card">
+       <div class="section-title">计算结果</div>
+       <div id="resultContainer">
+           <div class="empty-state">请选择日期后自动计算</div>
+       </div>
+   </div>
+ 
+   <script>
+       const startDateInput = document.getElementById('startDate');
+       const endDateInput = document.getElementById('endDate');
+       const travelTypeSelect = document.getElementById('travelType');
+       const breakfastRadios = document.querySelectorAll('input[name="breakfast"]');
+       const errorBanner = document.getElementById('errorBanner');
+       const resultContainer = document.getElementById('resultContainer');
+ 
+       // 补贴标准
+       const STANDARDS = {
+           food: 100,               // 伙食补贴：不含早标准
+           foodWithBreakfast: 80,   // 伙食补贴：含早标准
+           transport: 80             // 交通补贴：80元/天
+       };
+ 
+       // 2026年法定节假日（可按当年官方通知更新）
+       const LEGAL_HOLIDAYS = [
+           '2026-01-01', // 元旦
+           '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22', '2026-02-23', // 春节
+           '2026-04-05', '2026-04-06', '2026-04-07', // 清明节
+           '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05', // 劳动节
+           '2026-06-19', '2026-06-20', '2026-06-21', // 端午节
+           '2026-09-25', '2026-09-26', '2026-09-27', // 中秋节
+           '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07' // 国庆节
+       ];
+ 
+       // 监听输入变化，实时计算
+       startDateInput.addEventListener('change', calculate);
+       endDateInput.addEventListener('change', calculate);
+       travelTypeSelect.addEventListener('change', calculate);
+       breakfastRadios.forEach(radio => {
+           radio.addEventListener('change', calculate);
+       });
+ 
+       // 日期格式化（本地时间，避免时区偏差）
+       function formatDate(date) {
+           const y = date.getFullYear();
+           const m = String(date.getMonth() + 1).padStart(2, '0');
+           const d = String(date.getDate()).padStart(2, '0');
+           return `${y}-${m}-${d}`;
+       }
+ 
+       // 计算自然日天数
+       function getNaturalDays(startDate, endDate) {
+           const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+           const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+           const diffTime = end - start;
+           return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+       }
+ 
+       // 统计法定节假日天数（仅统计国家法定假，不含周末）
+       function getHolidayDays(startDate, endDate) {
+           const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+           const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+           let holidayDays = 0;
+           let current = new Date(start);
+           
+           while (current <= end) {
+               const dateStr = formatDate(current);
+               if (LEGAL_HOLIDAYS.includes(dateStr)) {
+                   holidayDays++;
+               }
+               current.setDate(current.getDate() + 1);
+           }
+           return holidayDays;
+       }
+ 
+       // 生成当前适用的计算规则
+       function generateRules(travelType, hasBreakfast) {
+           const rules = [];
+           
+           if (travelType === 'daily') {
+               rules.push('日常差旅：按自然日全额计算补贴');
+           } else if (travelType === 'training-inner') {
+               rules.push('系统内培训：仅计算首尾2天的伙食及交通补贴');
+           } else if (travelType === 'training-outer') {
+               rules.push('系统外培训：按自然日全额计算补贴');
+           }
+           
+           if (hasBreakfast) {
+               rules.push('伙食补贴：酒店含早80元/天，出发当天按100元计发');
+           } else {
+               rules.push('伙食补贴：酒店不含早100元/天');
+           }
+           
+           rules.push('交通补贴：80元/天');
+           rules.push('当天往返按单日标准计算');
+           
+           return rules;
+       }
+ 
+       // 主计算函数
+       function calculate() {
+           const startDateStr = startDateInput.value;
+           const endDateStr = endDateInput.value;
+           const travelType = travelTypeSelect.value;
+           const hasBreakfast = document.querySelector('input[name="breakfast"]:checked').value === 'yes';
+ 
+           if (!startDateStr || !endDateStr) {
+               resultContainer.innerHTML = '<div class="empty-state">请选择日期后自动计算</div>';
+               errorBanner.style.display = 'none';
+               return;
+           }
+ 
+           const startDate = new Date(startDateStr);
+           const endDate = new Date(endDateStr);
+ 
+           if (endDate < startDate) {
+               errorBanner.style.display = 'block';
+               resultContainer.innerHTML = '<div class="empty-state">日期输入异常，请检查后重新选择</div>';
+               return;
+           }
+           errorBanner.style.display = 'none';
+ 
+           const totalDays = getNaturalDays(startDate, endDate);
+           const isSameDay = totalDays === 1;
+           const holidayDays = getHolidayDays(startDate, endDate);
+ 
+           // 计算补贴天数
+           let foodDays, transportDays;
+           if (travelType === 'daily' || travelType === 'training-outer') {
+               foodDays = totalDays;
+               transportDays = totalDays;
+           } else if (travelType === 'training-inner') {
+               foodDays = totalDays <= 2 ? totalDays : 2;
+               transportDays = totalDays <= 2 ? totalDays : 2;
+           }
+ 
+           // 计算伙食补贴金额
+           let foodAmount;
+           if (hasBreakfast && !isSameDay) {
+               // 酒店含早：出发当天按全额100元，其余天数按80元
+               foodAmount = STANDARDS.food + (foodDays - 1) * STANDARDS.foodWithBreakfast;
+           } else {
+               foodAmount = foodDays * STANDARDS.food;
+           }
+ 
+           // 计算交通补贴金额
+           const transportAmount = transportDays * STANDARDS.transport;
+           const totalAmount = foodAmount + transportAmount;
+           const rules = generateRules(travelType, hasBreakfast);
+ 
+           renderResult({
+               totalDays,
+               isSameDay,
+               foodDays,
+               foodAmount,
+               transportDays,
+               transportAmount,
+               totalAmount,
+               holidayDays,
+               travelType,
+               rules
+           });
+       }
+ 
+       function renderResult(data) {
+           const { totalDays, isSameDay, foodDays, foodAmount, transportDays, transportAmount, totalAmount, holidayDays, travelType, rules } = data;
+ 
+           let typeText = '';
+           switch (travelType) {
+               case 'daily': typeText = '日常差旅'; break;
+               case 'training-inner': typeText = '系统内培训差旅'; break;
+               case 'training-outer': typeText = '系统外培训差旅'; break;
+           }
+ 
+           const sameDayTag = isSameDay ? '<span class="tag">当天往返</span>' : '';
+           
+           let holidayTip = '';
+           if (holidayDays > 0) {
+               holidayTip = `<div class="holiday-tip">差旅行程包含法定节假日共 <strong>${holidayDays}</strong> 天。如节假日期间未安排工作的，需扣减对应天数的差旅补贴。</div>`;
+           }
+ 
+           const ruleHtml = `
+               <div class="rule-card">
+                   <div class="rule-title">计算规则</div>
+                   <ul class="rule-list">
+                       ${rules.map(rule => `<li>${rule}</li>`).join('')}
+                   </ul>
+               </div>
+           `;
+ 
+           resultContainer.innerHTML = `
+               <div class="result-card">
+                   <div class="result-title">
+                       ${typeText}
+                       ${sameDayTag}
+                   </div>
+                   
+                   <div class="days-block">
+                       <div class="block-title">补贴天数</div>
+                       <div class="result-row">
+                           <span class="result-label">出差总天数</span>
+                           <span class="result-value">${totalDays} 天</span>
+                       </div>
+                       <div class="result-row">
+                           <span class="result-label">伙食补贴天数</span>
+                           <span class="result-value">${foodDays} 天</span>
+                       </div>
+                       <div class="result-row">
+                           <span class="result-label">交通补贴天数</span>
+                           <span class="result-value">${transportDays} 天</span>
+                       </div>
+                   </div>
+                   
+                   <div class="divider"></div>
+                   
+                   <div class="amount-block">
+                       <div class="block-title">补贴明细</div>
+                       <div class="result-row">
+                           <span class="result-label">伙食补贴金额</span>
+                           <span class="result-value">¥ ${foodAmount}</span>
+                       </div>
+                       <div class="result-row">
+                           <span class="result-label">交通补贴金额</span>
+                           <span class="result-value">¥ ${transportAmount}</span>
+                       </div>
+                       <div class="total-row">
+                           <span class="total-label">补贴合计</span>
+                           <span class="total-amount">¥ ${totalAmount}</span>
+                       </div>
+                   </div>
+               </div>
+               ${holidayTip}
+               ${ruleHtml}
+               <div class="footer-tip">计算结果仅供参考，如有疑问可进一步咨询</div>
+           `;
+       }
+   </script>
+</body>
+</html>
